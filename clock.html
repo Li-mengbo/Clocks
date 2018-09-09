@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>钟表</title>
+    <style>
+        #canvas {
+            border: 1px solid #000;
+            margin: 0 auto;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <script>
+        var canvas = document.getElementById('canvas'),
+            context = canvas.getContext('2d'),
+            deg = Math.PI / 180;
+        context.translate(200, 200);
+
+        function dialPlate() { //创建表盘
+            context.clearRect(-150, -150, 400, 400); //清除画布
+            context.beginPath();
+            context.arc(0, 0, 150, 0, 360 * deg);
+            context.lineWidth = 3;
+            context.stroke();
+            context.closePath();
+            //创建刻度
+            for (var i = 1; i <= 60; i++) {
+                context.beginPath();
+                context.save();
+                context.rotate(6 * i * deg);
+                context.moveTo(0, -150);
+                if (i % 15 == 0) {
+                    context.strokeStyle = 'red';
+                    context.lineWidth = 3;
+                    context.lineTo(0, -135);
+                    context.stroke();
+                } else if (i % 5 == 0) {
+                    context.strokeStyle = 'orange';
+                    context.lineWidth = 2;
+                    context.lineTo(0, -140);
+                    context.stroke();
+                } else {
+                    context.strokeStyle = '#000';
+                    context.lineWidth = 1;
+                    context.lineTo(0, -145);
+                    context.stroke();
+                }
+                context.restore();
+                context.closePath();
+            }
+            //创建数字
+            for (var i = 1; i <= 12; i++) {
+                context.beginPath();
+                context.save();
+                context.rotate(30 * i * deg);
+                context.textAlign = 'center';
+                if (i % 3 == 0) {
+                    context.fillStyle = 'red';
+                    context.font = "normal 28px arial";
+                    context.fillText(i, 0, -110);
+                } else {
+                    context.font = "normal 20px arial";
+                    context.fillText(i, 0, -120);
+                }
+                context.restore();
+                context.closePath();
+            }
+            //中心点
+            context.beginPath();
+            context.arc(0, 0, 5, 0, 360 * deg);
+            context.fill();
+            context.closePath();
+        }
+
+        function Pointer() { //创建指针
+            var nowdate = new Date(),
+                hour = nowdate.getHours() % 12,
+                minu = nowdate.getMinutes(),
+                second = nowdate.getSeconds();
+            var ms = nowdate.getMilliseconds(); //毫秒
+            //秒针
+            context.beginPath();
+            context.save();
+            context.lineWidth = 1;
+            context.strokeStyle = 'red';
+            //context.rotate(6*second*deg);
+            context.rotate((ms / 1000 + second) * 6 * deg);
+            context.moveTo(0, 20);
+            context.lineTo(0, -130);
+            context.stroke();
+            context.restore();
+            context.closePath();
+            //分针
+            context.beginPath();
+            context.save();
+            context.lineWidth = 2;
+            context.strokeStyle = 'orange';
+            //context.rotate((second/60+minu)*6*deg);
+            context.rotate((ms / 1000 / 60 + second / 60 + minu) * 6 * deg);
+            context.moveTo(0, 10);
+            context.lineTo(0, -120);
+            context.stroke();
+            context.restore();
+            context.closePath();
+            //时针
+            context.beginPath();
+            context.save();
+            context.lineWidth = 3;
+            context.strokeStyle = '#000';
+            //context.rotate((second/3600+minu/60+hour)*30*deg);
+            context.rotate((ms / 1000 / 60 / 60 + second / 60 / 60 + minu / 60 + hour) * 30 * deg);
+            context.moveTo(0, 0);
+            context.lineTo(0, -110);
+            context.stroke();
+            context.restore();
+            context.closePath();
+        }
+
+        dialPlate();
+        Pointer();
+        //生硬
+        //			setInterval(function(){
+        //				dialPlate();
+        //				Pointer();
+        //			},1000)
+        //比较圆滑
+        setInterval(function() {
+            dialPlate();
+            Pointer();
+        }, 1000 / 60)
+    </script>
+</body>
+
+</html>
